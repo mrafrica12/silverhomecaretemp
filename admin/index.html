@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Portal — SilverNest Home Care</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="../assets/logo/logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260611-8">
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate" class="admin-gate">
+  <div class="admin-gate__card">
+    <div class="admin-gate__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <h2>Admin Portal</h2>
+    <p>Enter your access PIN to continue. Contact your administrator if you need access.</p>
+    <!--
+      NOTE: This is a client-side PIN gate — a deterrent layer only.
+      For HIPAA production environments, replace with server-side
+      authentication (OAuth, SSO, or a dedicated HIPAA-compliant portal).
+    -->
+    <form id="gate-form" class="form" autocomplete="off" aria-label="Admin login">
+      <div class="form-group">
+        <label class="form-label sr-only" for="pin">Access PIN</label>
+        <input class="form-input" type="password" id="pin" name="pin"
+          placeholder="Enter PIN" inputmode="numeric" maxlength="8"
+          style="text-align:center;font-size:1.5rem;letter-spacing:0.2em;">
+        <span class="form-error" id="pin-error"></span>
+      </div>
+      <button type="submit" class="btn btn--primary w-full">Unlock Portal</button>
+    </form>
+    <p style="margin-top:1.5rem;font-size:var(--text-xs);color:var(--gray-400);line-height:1.6;">
+      Having trouble? Contact <a href="mailto:Info@silvernesthomecare.net" style="color:var(--sage-dark);">Info@silvernesthomecare.net</a>
+    </p>
+  </div>
+</div>
+
+<!-- ADMIN PORTAL (hidden until auth) -->
+<div id="portal" class="admin-layout hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="admin-sidebar__logo">
+      <div style="width:140px;height:60px;display:flex;align-items:center;">
+        <img src="../assets/logo/logo.webp" alt="SilverNest Home Care" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.35));">
+      </div>
+      <div style="font-size:0.6875rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:0.5rem;">Admin Portal</div>
+    </div>
+
+    <div class="admin-sidebar__nav">
+      <a href="#" class="admin-sidebar__link active" data-tab="leads" onclick="switchTab('leads',this);return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Leads
+      </a>
+      <a href="#" class="admin-sidebar__link" data-tab="reminders" onclick="switchTab('reminders',this);return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        Reminders
+      </a>
+      <a href="#" class="admin-sidebar__link" data-tab="settings" onclick="switchTab('settings',this);return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="admin-sidebar__footer">
+      <button onclick="logout()" class="admin-sidebar__link" style="width:100%;text-align:left;cursor:pointer;background:none;border:none;" aria-label="Log out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:17px;height:17px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+
+    <!-- TOPBAR -->
+    <div class="admin-topbar">
+      <div>
+        <h1 style="font-size:1.125rem;font-weight:700;" id="tab-title">Leads</h1>
+        <p style="font-size:var(--text-xs);color:var(--gray-600);" id="tab-subtitle">All client intake submissions</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;">
+        <button onclick="exportCSV()" class="btn btn--primary btn--sm" aria-label="Export to CSV">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- LEADS TAB -->
+      <div id="tab-leads">
+
+        <!-- Daily Summary -->
+        <div id="daily-summary" class="hidden"></div>
+
+        <!-- Stats -->
+        <div class="admin-stats-grid">
+          <div class="admin-stat">
+            <div class="admin-stat__label">Total Leads</div>
+            <div class="admin-stat__number" id="stat-total">—</div>
+          </div>
+          <div class="admin-stat">
+            <div class="admin-stat__label">New This Week</div>
+            <div class="admin-stat__number" id="stat-new" style="color:var(--sage);">—</div>
+          </div>
+          <div class="admin-stat">
+            <div class="admin-stat__label">Conversion Rate</div>
+            <div class="admin-stat__number" id="stat-conversion" style="color:var(--sage);">—</div>
+          </div>
+          <div class="admin-stat" id="stat-urgent-card">
+            <div class="admin-stat__label">Need Action</div>
+            <div class="admin-stat__number" id="stat-urgent" style="color:var(--gray-400);">—</div>
+          </div>
+        </div>
+
+        <!-- Search + Filter Toolbar -->
+        <div class="leads-toolbar">
+          <div style="position:relative;flex:1;min-width:220px;">
+            <svg style="position:absolute;left:0.875rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--gray-400);pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="search" id="leads-search" class="leads-search" placeholder="Search name, phone, email, care needs…" oninput="filterLeads()" autocomplete="off" aria-label="Search leads">
+          </div>
+          <select id="leads-status-filter" class="leads-filter" onchange="filterLeads()" aria-label="Filter by status">
+            <option value="">All Statuses</option>
+            <option value="New">🟢 New</option>
+            <option value="Contacted">🔵 Contacted</option>
+            <option value="Consultation Scheduled">📅 Consultation Scheduled</option>
+            <option value="In Progress">🔄 In Progress</option>
+            <option value="Converted">🏆 Converted</option>
+            <option value="Not a Fit">🚫 Not a Fit</option>
+            <option value="Closed">⚫ Closed</option>
+          </select>
+          <span id="leads-count" class="leads-toolbar__count"></span>
+        </div>
+
+        <!-- Stale Lead Banner -->
+        <div id="stale-banner" class="hidden"></div>
+
+        <!-- Table -->
+        <div class="admin-card" style="padding:0;overflow:hidden;">
+          <div id="leads-loading" style="padding:3rem;text-align:center;color:var(--gray-400);">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">⏳</div>
+            <p>Loading leads… Configure your Apps Script URL in Settings first.</p>
+          </div>
+          <div id="leads-empty" class="hidden" style="padding:3rem;text-align:center;color:var(--gray-400);">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">📋</div>
+            <p>No leads yet. Submissions from your intake form will appear here.</p>
+          </div>
+          <div id="leads-table-wrap" class="hidden" style="overflow-x:auto;">
+            <table class="admin-table" aria-label="Client leads">
+              <thead>
+                <tr>
+                  <th style="width:32px;" aria-label="Priority"></th>
+                  <th>Date</th>
+                  <th>Name</th>
+                  <th class="col-hide-mobile">Phone</th>
+                  <th class="col-hide-mobile">Email</th>
+                  <th class="col-hide-mobile">Care Needs</th>
+                  <th class="col-hide-mobile">Contact Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="leads-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- REMINDERS TAB -->
+      <div id="tab-reminders" class="hidden">
+
+        <!-- Set Reminder Form -->
+        <div class="admin-card" style="max-width:660px;margin-bottom:1.5rem;">
+          <h2 style="font-size:1.125rem;margin-bottom:0.375rem;">Set a Follow-Up Reminder</h2>
+          <p style="font-size:var(--text-small);color:var(--gray-600);margin-bottom:1.5rem;">Pick a lead and choose when to receive an email reminder to follow up.</p>
+
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="rem-lead-name">Lead Name <span style="color:var(--sage);">*</span></label>
+                <input class="form-input" type="text" id="rem-lead-name" placeholder="e.g. Jane Smith">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="rem-lead-phone">Phone</label>
+                <input class="form-input" type="tel" id="rem-lead-phone" placeholder="(555) 000-0000">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rem-lead-email">Email</label>
+              <input class="form-input" type="email" id="rem-lead-email" placeholder="jane@example.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Remind Me In</label>
+              <div style="display:flex;gap:0.625rem;flex-wrap:wrap;margin-top:0.25rem;">
+                <button onclick="quickReminder(1)"  class="btn btn--outline btn--sm" type="button">⏰ 1 Hour</button>
+                <button onclick="quickReminder(24)" class="btn btn--outline btn--sm" type="button">📅 1 Day</button>
+                <button onclick="quickReminder(48)" class="btn btn--outline btn--sm" type="button">📅 2 Days</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rem-custom-time">Or pick a custom date &amp; time</label>
+              <input class="form-input" type="datetime-local" id="rem-custom-time">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rem-notes">Notes (optional)</label>
+              <textarea class="form-textarea" id="rem-notes" rows="2" placeholder="What do you want to follow up about?"></textarea>
+            </div>
+
+            <button onclick="setReminder()" class="btn btn--primary" type="button">Set Reminder →</button>
+          </div>
+          <div id="reminder-result" style="margin-top:1rem;font-size:var(--text-small);display:none;padding:.75rem 1rem;border-radius:var(--radius-sm);"></div>
+        </div>
+
+        <!-- Reminders List -->
+        <div class="admin-card" style="padding:0;overflow:hidden;">
+          <div style="padding:1.25rem 1.75rem;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="font-size:1rem;font-weight:700;">Scheduled Reminders</h3>
+            <button onclick="loadReminders()" class="btn btn--outline btn--sm" type="button">Refresh</button>
+          </div>
+          <div id="reminders-loading" style="padding:2.5rem;text-align:center;color:var(--gray-400);">
+            <div style="font-size:2rem;margin-bottom:.75rem;">⏳</div>
+            <p>Loading reminders…</p>
+          </div>
+          <div id="reminders-empty" class="hidden" style="padding:2.5rem;text-align:center;color:var(--gray-400);">
+            <div style="font-size:2rem;margin-bottom:.75rem;">🔔</div>
+            <p>No reminders set yet.</p>
+          </div>
+          <div id="reminders-table-wrap" class="hidden" style="overflow-x:auto;">
+            <table class="admin-table" aria-label="Scheduled reminders">
+              <thead>
+                <tr>
+                  <th>Lead</th>
+                  <th>Contact</th>
+                  <th>Remind At</th>
+                  <th>Notes</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="reminders-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="tab-settings" class="hidden">
+        <div class="admin-card" style="max-width:600px;">
+          <h2 style="font-size:1.125rem;margin-bottom:0.375rem;">Apps Script Connection</h2>
+          <p style="font-size:var(--text-small);color:var(--gray-600);margin-bottom:1.5rem;">Paste your deployed Google Apps Script Web App URL below. This connects the admin portal to your Google Sheet.</p>
+
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label class="form-label" for="script-url">Apps Script Web App URL</label>
+            <input class="form-input" type="url" id="script-url" placeholder="https://script.google.com/macros/s/AKfycbznGl2KJSB4LkRQQV4yYGPOvzOQ5ie4s-7fK0MO6TKOX7992QDRZYacMMaCXXIFZI0/exec">
+            <span class="form-hint">Deploy as Web App → Access: Anyone → Copy the URL here.</span>
+          </div>
+
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button onclick="saveScriptUrl()" class="btn btn--primary">Save URL</button>
+            <button onclick="testConnection()" class="btn btn--outline">Test Connection</button>
+          </div>
+
+          <div id="connection-result" style="margin-top:1rem;font-size:var(--text-small);display:none;"></div>
+        </div>
+
+        <div class="admin-card" style="max-width:600px;margin-top:1.5rem;">
+          <h2 style="font-size:1.125rem;margin-bottom:0.375rem;">Security Notice</h2>
+          <div style="background:rgba(245,197,66,0.1);border:1px solid rgba(245,197,66,0.3);border-radius:var(--radius-md);padding:1rem;font-size:var(--text-small);color:var(--gray-600);line-height:1.7;">
+            ⚠️ This portal uses a client-side PIN gate — a deterrent layer, not a secure vault. For production environments handling Protected Health Information (PHI), upgrade to server-side authentication (OAuth 2.0, SSO) or use a HIPAA-compliant portal platform.
+          </div>
+          <div style="margin-top:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="new-pin">Change Access PIN</label>
+              <input class="form-input" type="password" id="new-pin" placeholder="Enter new PIN (min 6 digits)" inputmode="numeric" maxlength="8">
+            </div>
+            <button onclick="changePin()" class="btn btn--outline btn--sm" style="margin-top:0.75rem;">Update PIN</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LEAD DETAIL DRAWER -->
+<div id="lead-drawer" class="lead-drawer" role="dialog" aria-modal="true" aria-label="Lead details" hidden>
+  <div class="lead-drawer__backdrop" onclick="closeDrawer()"></div>
+  <div class="lead-drawer__panel">
+    <div class="lead-drawer__header">
+      <div>
+        <div id="drawer-name" style="font-size:1.125rem;font-weight:700;color:var(--navy);"></div>
+        <div id="drawer-date" style="font-size:var(--text-xs);color:var(--gray-400);margin-top:0.2rem;"></div>
+      </div>
+      <button onclick="closeDrawer()" class="lead-drawer__close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="lead-drawer__body">
+
+      <!-- Contact -->
+      <div class="drawer-section">
+        <div class="drawer-section__title">Contact</div>
+        <div class="drawer-grid">
+          <div class="drawer-field"><span class="drawer-field__label">Phone</span><a id="drawer-phone" href="#" class="drawer-field__link"></a></div>
+          <div class="drawer-field"><span class="drawer-field__label">Email</span><a id="drawer-email" href="#" class="drawer-field__link drawer-field__link--break"></a></div>
+          <div class="drawer-field"><span class="drawer-field__label">Best Time to Call</span><span id="drawer-contact-time" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Referral Source</span><span id="drawer-referral" class="drawer-field__value"></span></div>
+        </div>
+      </div>
+
+      <!-- Care Details -->
+      <div class="drawer-section">
+        <div class="drawer-section__title">Care Details</div>
+        <div class="drawer-grid">
+          <div class="drawer-field"><span class="drawer-field__label">Care Recipient</span><span id="drawer-recipient" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Relationship</span><span id="drawer-relationship" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Care Needs</span><span id="drawer-care-needs" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Care Frequency</span><span id="drawer-care-freq" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Start Timeline</span><span id="drawer-timeline" class="drawer-field__value"></span></div>
+          <div class="drawer-field"><span class="drawer-field__label">Form Type</span><span id="drawer-form-type" class="drawer-field__value"></span></div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="drawer-section">
+        <div class="drawer-section__title">Status</div>
+        <select id="drawer-status" class="status-select" onchange="updateStatusFromDrawer(this)" style="padding:.45rem .85rem;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:700;border:1.5px solid;cursor:pointer;appearance:none;-webkit-appearance:none;background:none;outline:none;">
+          <option value="New">🟢 New</option>
+          <option value="Contacted">🔵 Contacted</option>
+          <option value="Consultation Scheduled">📅 Consultation Scheduled</option>
+          <option value="In Progress">🔄 In Progress</option>
+          <option value="Converted">🏆 Converted</option>
+          <option value="Not a Fit">🚫 Not a Fit</option>
+          <option value="Closed">⚫ Closed</option>
+        </select>
+      </div>
+
+      <!-- Notes -->
+      <div class="drawer-section">
+        <div class="drawer-section__title">Private Notes</div>
+        <div class="note-templates" aria-label="Quick note templates">
+          <button type="button" class="note-template-btn" onclick="insertNoteTemplate('Left voicemail')">📞 Left voicemail</button>
+          <button type="button" class="note-template-btn" onclick="insertNoteTemplate('Sent intake form link')">📋 Sent intake link</button>
+          <button type="button" class="note-template-btn" onclick="insertNoteTemplate('Family needs time to decide')">⏳ Needs time</button>
+        </div>
+        <textarea id="drawer-notes" class="form-textarea" rows="4" placeholder="Add notes about this lead — follow-up calls, care requirements, family preferences…" style="font-size:var(--text-small);"></textarea>
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.75rem;">
+          <button onclick="saveNote()" class="btn btn--primary btn--sm">Save Note</button>
+          <span id="drawer-note-result" style="font-size:var(--text-xs);color:var(--sage-dark);opacity:0;transition:opacity .3s;"></span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="drawer-section" style="border-bottom:none;">
+        <div class="drawer-section__title">Quick Actions</div>
+        <div style="display:flex;gap:0.625rem;flex-wrap:wrap;">
+          <a id="drawer-call-btn"  href="#" class="btn btn--outline btn--sm">📞 Call</a>
+          <a id="drawer-email-btn" href="#" class="btn btn--outline btn--sm">✉️ Email</a>
+          <button onclick="prefillReminder()" class="btn btn--outline btn--sm">⏰ Set Reminder</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM TAB BAR -->
+<nav class="admin-bottom-nav" aria-label="Mobile navigation">
+  <button class="admin-bottom-nav__item active" data-tab="leads" onclick="switchTab('leads',this);return false;" aria-label="Leads">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    <span>Leads</span>
+  </button>
+  <button class="admin-bottom-nav__item" data-tab="reminders" onclick="switchTab('reminders',this);return false;" aria-label="Reminders">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <span>Reminders</span>
+  </button>
+  <button class="admin-bottom-nav__item" data-tab="settings" onclick="switchTab('settings',this);return false;" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>Settings</span>
+  </button>
+  <button class="admin-bottom-nav__item admin-bottom-nav__item--logout" onclick="logout()" aria-label="Log out">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span>Log Out</span>
+  </button>
+</nav>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
